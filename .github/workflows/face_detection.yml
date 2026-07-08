@@ -1,1 +1,85 @@
+name: Employee Face Detection
 
+
+on:
+
+  push:
+
+    paths:
+
+      - "images/**"
+
+
+
+jobs:
+
+
+  face-recognition:
+
+
+    runs-on: ubuntu-latest
+
+
+
+    steps:
+
+
+    - name: Checkout code
+
+      uses: actions/checkout@v4
+
+
+
+    - name: Setup Python
+
+      uses: actions/setup-python@v5
+
+      with:
+
+        python-version: "3.12"
+
+
+
+    - name: Install dependencies
+
+      run:
+
+        pip install -r requirements.txt
+
+
+
+    - name: Run Face Detection
+
+      env:
+
+        AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+
+        AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+
+        AWS_DEFAULT_REGION: ap-south-1
+
+
+      run:
+
+        python app.py
+
+
+
+    - name: Commit result.json
+
+      run:
+
+
+        git config --global user.name "github-actions"
+
+
+        git config --global user.email "actions@github.com"
+
+
+        git add result.json
+
+
+        git commit -m "Add face detection result" || echo "No changes"
+
+
+        git push
